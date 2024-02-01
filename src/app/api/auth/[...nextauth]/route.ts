@@ -56,10 +56,11 @@ const authOptions: NextAuthOptions = {
         };
         await loginWithGoogle(
           data,
-          (result: { status: boolean; data: any }) => {
+          (result: any) => {
             token.email = result.data.email;
             token.fullname = result.data.fullname;
-            token.role = result.data.role;
+            // token.role = result.data.role;
+            
           }
         );
       }

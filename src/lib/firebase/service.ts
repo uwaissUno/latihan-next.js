@@ -73,7 +73,8 @@ export async function login(data: { email: string }) {
   }
 }
 
-export async function loginWithGoogle(data: any, callback : Function) {
+export async function loginWithGoogle(data: any, callback : any) {
+ try{
   const q = query(
     collection(firestore, "users"),
     where("email", "==", data.email)
@@ -86,11 +87,17 @@ export async function loginWithGoogle(data: any, callback : Function) {
   if (user.length > 0) {
     data.role = data[0].role;
     await updateDoc(doc(firestore, "users", user[0].id), data).then(() => {
-   
+      // callback({status : true, data : data})
     });
+    // console.log( await updateDoc(doc(firestore, "users", user[0].id), data).then(() => {
+    //   callback({status : true, data : data})
+    // }))
   } else {
     await addDoc(collection(firestore, "users"), data).then(() => {
       callback({status : true, data : data})
     });
   }
+ }catch{
+  console.error('Something went wrong')
+ }
 }

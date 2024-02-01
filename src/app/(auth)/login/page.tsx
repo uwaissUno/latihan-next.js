@@ -10,10 +10,11 @@ const LoginPage = ({ searchParams }: any) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const callbackUrl = searchParams.callbackUrl || "/";
   const handleLogin = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    const callbackUrl = searchParams.callbackUrl || "/";
+    
     try {
       const res = await signIn("credentials", {
         redirect: false,
@@ -85,7 +86,7 @@ const LoginPage = ({ searchParams }: any) => {
             type="button"
             className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             onClick={() => {
-              const callbackUrl = searchParams.callbackUrl || "/";
+              // const callbackUrl = searchParams.callbackUrl || "/";
               signIn("google", {
                 callbackUrl,
                 redirect: true,
