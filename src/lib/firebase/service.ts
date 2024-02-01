@@ -7,6 +7,7 @@ import {
   query,
   where,
   addDoc,
+  updateDoc,
 } from "firebase/firestore";
 import app from "./init";
 import bcyrpt from "bcrypt";
@@ -23,15 +24,12 @@ export async function retrieveDataById(collectionName: string, id: string) {
   return data;
 }
 
-export async function register(
-  data: {
-    fullname: string;
-    email: string;
-    password: string;
-    role?: string;
-  },
-  callback: Function
-) {
+export async function register(data: {
+  fullname: string;
+  email: string;
+  password: string;
+  role?: string;
+}) {
   const q = query(
     collection(firestore, "users"),
     where("email", "==", data.email)
@@ -42,16 +40,57 @@ export async function register(
     ...doc.data(),
   }));
   if (users.length > 0) {
-    callback({ status: false, message: "Email already registered" });
+    return {
+      status: false,
+      message: "Email already registered",
+      statusCode: 400,
+    };
   } else {
-    data.role = "admin";
+    data.role = "member";
     data.password = await bcyrpt.hash(data.password, 10);
   }
-  await addDoc(collection(firestore, "users"), data)
-    .then(() => {
-      callback({ status: true, message: "Register Success" });
-    })
-    .catch((err) => {
-      callback({ status: false, message: err.message });
+  try {
+    await addDoc(collection(firestore, "users"), data);
+    return { status: true, message: "Register Success", statusCode: 200 };
+  } catch (err) {
+    return { status: false, message: "Register Failed", statusCode: 400 };
+  }
+}
+export async function login(data: { email: string }) {
+  const q = query(
+    collection(firestore, "users"),
+    where("email", "==", data.email)
+  );
+  const snapshot = await getDocs(q);
+  const user = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+  if (user.length > 0) {
+    return user[0];
+  } else {
+    return null;
+  }
+}
+
+export async function loginWithGoogle(data: any, callback : Function) {
+  const q = query(
+    collection(firestore, "users"),
+    where("email", "==", data.email)
+  );
+  const snapshot = await getDocs(q);
+  const user = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+  if (user.length > 0) {
+    data.role = data[0].role;
+    await updateDoc(doc(firestore, "users", user[0].id), data).then(() => {
+   
     });
+  } else {
+    await addDoc(collection(firestore, "users"), data).then(() => {
+      callback({status : true, data : data})
+    });
+  }
 }

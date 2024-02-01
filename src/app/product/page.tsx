@@ -4,6 +4,7 @@
 import app from "@/lib/firebase/init";
 import getData from "@/services";
 import Link from "next/link";
+import Image from "next/image";
 
 // unruk menangkap semua parameter, kita gunakan [...nama  folder]
 type DetailProductPageProps = {
@@ -12,7 +13,6 @@ type DetailProductPageProps = {
   };
 };
 
-console.log(app)
 
 const DetailProductPage = async (props: DetailProductPageProps) => {
   const { params } = props;
@@ -26,15 +26,18 @@ const DetailProductPage = async (props: DetailProductPageProps) => {
         {products.data.length > 0 &&
           products.data.map((product: any) => (
             <Link
-            href={'/product/detail/' + product.id}
+            href={'http://localhost:3000/product/detail/' + product.id}
               className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 my-3 "
               key={product.id}
             >
               
-                <img
+                <Image
                   className="p-8 rounded-t-lg h-80 w-full object-cover"
                   src={product.image}
                   alt="product image"
+                  width={1024}
+                  height={1024}
+                  loading="lazy"
                 />
               
               <div className="px-5 pb-5">

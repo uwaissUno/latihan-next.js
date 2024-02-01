@@ -1,13 +1,16 @@
-'use client';
+"use client";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "./navbar";
 import { usePathname } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
 // import { useState } from "react";
 
-const inter = Inter({ subsets: ["latin"] });
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+});
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",
@@ -20,17 +23,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   // const [state, setState] = useState(0)
-  const disableNav = ['/login', '/register', '/404']
-  const path = usePathname()
-  console.log(path)
+  const disableNav = ["/login", "/register", "/404"];
+  const path = usePathname();
+  console.log(path);
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={poppins.className}>
         <SessionProvider>
-        {!disableNav.includes(path) && <Navbar />}
-        {/* <h1>Layout : {state}</h1>
+          {!disableNav.includes(path) && <Navbar />}
+          {/* <h1>Layout : {state}</h1>
         <button onClick={() => setState(state + 1)} className="block">Click</button> */}
-        {children}
+          {children}
         </SessionProvider>
       </body>
     </html>

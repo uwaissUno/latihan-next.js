@@ -1,15 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import withAuth from "./middlewares/withAuth";
 // kita dapat menggunakan middleware untuk me redirect ke halaman tertentu berdasarkan kondisi tertentu
 // untuk membuat middleware, kita buat file bernama middleware di dalam src secara langsung
-export default function middleware(request: NextRequest) {
+export  function mainMiddleware(request: NextRequest) {
     // penggunaannya adaah dengan export default function bernama middleware
-  const login = true;
-  if (!login) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  const res = NextResponse.next()
+  return res
 }
-export const config = {
-    // fungsi config & matcher adalah untuk meredirect ketika pernyataan salah dan memeilih url apa saja yang akan di redeirect
-  matcher: ["/about/:path*", '/dashboard/:path*', '/product/:path*'],
-};
+export default withAuth(mainMiddleware, ['/dashboard', '/profile', '/login', '/register']);

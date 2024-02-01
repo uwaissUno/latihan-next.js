@@ -3,11 +3,13 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 // kita bisa mengetahui path kita sekarang dengan usePathname
 // kita dapat menggunakan useRouter untuk mengarahkan kepada path yang kita inginkan
 
 const Navbar = () => {
-  const { status }: { status: string } = useSession();
+  const { data: session, status }: { data: any; status: string } = useSession();
+  console.log(session);
   const pathname = usePathname();
   // console.log(pathname);
   const router = useRouter();
@@ -38,21 +40,38 @@ const Navbar = () => {
           </li>
         </ul>
       </div>
+
       <div>
         {status === "unauthenticated" ? (
-          <button
-            className="bg-white px-5 py-2 font-semibold rounded-md"
-            onClick={() => signIn()}
-          >
-            Login
-          </button>
+          <div>
+            
+            <button
+              className="bg-white px-5 py-2 font-semibold rounded-md"
+              onClick={() => signIn()}
+            >
+              Login
+            </button>
+          </div>
         ) : (
-          <button
-            className="bg-white px-5 py-2 font-semibold rounded-md"
-            onClick={() => signOut()}
-          >
-            Logout
-          </button>
+          <div className="flex items-center">
+           
+            <Image
+              src={"/images/profile.png"}
+              alt="profile"
+              className="w-10 h-10 rounded-full mr-4"
+              width={200}
+              height={200}
+            />
+             <h4 className="font-bold text-white mr-4">
+              {session?.user?.fullname}
+            </h4>
+            <button
+              className="bg-white px-5 py-2 font-semibold rounded-md"
+              onClick={() => signOut()}
+            >
+              Logout
+            </button>
+          </div>
         )}
       </div>
     </nav>

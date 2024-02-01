@@ -1,7 +1,9 @@
-import Modal from "@/components/core/Modal";
+
 import getData from "@/services";
+import dynamic from "next/dynamic";
 
 export default async function DetailPage(props: any) {
+  const Modal = dynamic(() => import("@/components/core/Modal"));
   const { params } = props;
   const detail = await getData(
     "http://localhost:3000/api/products?id=" + params.id

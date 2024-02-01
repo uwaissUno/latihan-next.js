@@ -1,13 +1,16 @@
 // Import yang diperbarui
+import { login, loginWithGoogle } from "@/lib/firebase/service";
+import { compare } from "bcrypt";
 import { NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 
 const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: "Uwaiss123",
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       type: "credentials",
@@ -21,16 +24,21 @@ const authOptions: NextAuthOptions = {
           email: string;
           password: string;
         };
-        const user: any = {
-          id: "1",
-          name: "uwaiss",
-          email: "uwaissmaliki@gmail.com",
-          role: "admin",
-        };
-        if (email === "uwaissmaliki@gmail.com" && password === "nigger") {
-          return user;
+        const user: any = await login({ email });
+
+        if (user) {
+          const passwordConfirm = await compare(password, user.password);
+          if (passwordConfirm) {
+            return user;
+          }
+          return null;
         }
+        return null;
       },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_AUTH_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_AUTH_CLIENT_SECRET || "",
     }),
   ],
   callbacks: {
@@ -39,6 +47,21 @@ const authOptions: NextAuthOptions = {
         token.email = user.email;
         token.fullname = user.fullname;
         token.role = user.role;
+      }
+      if (account?.provider === "google") {
+        const data = {
+          fullname: user.name,
+          email: user.email,
+          type: "google",
+        };
+        await loginWithGoogle(
+          data,
+          (result: { status: boolean; data: any }) => {
+            token.email = result.data.email;
+            token.fullname = result.data.fullname;
+            token.role = result.data.role;
+          }
+        );
       }
       return token;
     },
@@ -55,9 +78,9 @@ const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  pages:{
-    signIn : '/login'
-  }
+  pages: {
+    signIn: "/login",
+  },
 };
 
 const handler = NextAuth(authOptions);
