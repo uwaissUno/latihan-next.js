@@ -7,24 +7,25 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
 const authOptions: NextAuthOptions = {
-  session: {
-    strategy: "jwt",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
-  providers: [
-    CredentialsProvider({
-      type: "credentials",
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        const { email, password } = credentials as {
-          email: string;
-          password: string;
-        };
-        const user: any = await login({ email });
+	session: {
+		strategy: "jwt",
+	},
+	secret: process.env.NEXTAUTH_SECRET,
+	// secret: "Uwaiss123",
+	providers: [
+		CredentialsProvider({
+			type: "credentials",
+			name: "Credentials",
+			credentials: {
+				email: { label: "Email", type: "email" },
+				password: { label: "Password", type: "password" },
+			},
+			async authorize(credentials) {
+				const { email, password } = credentials as {
+					email: string;
+					password: string;
+				};
+				const user: any = await login({ email });
 
         if (user) {
           const passwordConfirm = await compare(password, user.password);
@@ -56,11 +57,10 @@ const authOptions: NextAuthOptions = {
         };
         await loginWithGoogle(
           data,
-          (result: any) => {
+          (result: { status: boolean; data: any }) => {
             token.email = result.data.email;
             token.fullname = result.data.fullname;
-            // token.role = result.data.role;
-            
+            token.role = result.data.role;
           }
         );
       }
